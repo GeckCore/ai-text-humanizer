@@ -1,5 +1,6 @@
 """
 Ollama Rewriter Engine - Humanizes AI-generated text
+VERSIÓN MEJORADA con prompts optimizados
 """
 
 import ollama
@@ -10,15 +11,10 @@ logger = setup_logger(__name__)
 
 
 class OllamaRewriter:
-    """Rewrite text using local Ollama model"""
+    """Rewrite text using local Ollama model with improved prompts"""
     
     def __init__(self, config: dict):
-        """
-        Initialize Ollama rewriter
-        
-        Args:
-            config: Application configuration
-        """
+        """Initialize Ollama rewriter"""
         self.config = config
         self.ollama_config = config['ollama']
         self.model = self.ollama_config['model']
@@ -31,20 +27,16 @@ class OllamaRewriter:
     def _verify_ollama(self):
         """Verify Ollama is installed and model is available"""
         try:
-            # List available models
             models_response = ollama.list()
             
-            # Handle different response formats
             if isinstance(models_response, dict):
                 models_list = models_response.get('models', [])
             else:
                 models_list = models_response
             
-            # Extract model names - handle different formats
             model_names = []
             for model in models_list:
                 if isinstance(model, dict):
-                    # Try different possible keys
                     name = model.get('name') or model.get('model') or model.get('id')
                     if name:
                         model_names.append(name)
@@ -53,7 +45,6 @@ class OllamaRewriter:
             
             logger.info(f"Available Ollama models: {model_names}")
             
-            # Check if our model is available
             model_found = False
             for name in model_names:
                 if self.model in name or name in self.model:
@@ -61,15 +52,13 @@ class OllamaRewriter:
                     break
             
             if not model_found:
-                logger.warning(f"Model {self.model} not found in available models: {model_names}")
-                logger.warning(f"Attempting to use model anyway. If it fails, run: ollama pull {self.model}")
+                logger.warning(f"Model {self.model} not found. Available: {model_names}")
+                logger.warning(f"Attempting to use anyway. Run: ollama pull {self.model}")
             else:
                 logger.info(f"Ollama model {self.model} is ready")
             
         except Exception as e:
             logger.error(f"Error verifying Ollama: {e}")
-            logger.info("Make sure Ollama is running and the model is pulled")
-            logger.info(f"To install: ollama pull {self.model}")
             raise Exception(f"Ollama not available: {e}")
     
     def humanize(self, text: str, language: str, iteration: int = 1) -> Optional[str]:
@@ -89,18 +78,21 @@ class OllamaRewriter:
             
             logger.info(f"Humanizing text (iteration {iteration}) with {self.model}")
             
+            # Use higher temperature for more variation
+            temp = min(0.9, self.temperature + (iteration * 0.05))
+            
             response = ollama.generate(
                 model=self.model,
                 prompt=prompt,
                 options={
-                    'temperature': self.temperature,
-                    'num_predict': self.max_tokens
+                    'temperature': temp,
+                    'num_predict': self.max_tokens,
+                    'top_p': 0.9,
+                    'top_k': 40
                 }
             )
             
             humanized = response['response'].strip()
-            
-            # Clean up potential markdown artifacts
             humanized = self._clean_response(humanized)
             
             logger.info(f"Successfully humanized text ({len(humanized)} chars)")
@@ -112,7 +104,7 @@ class OllamaRewriter:
             return None
     
     def _build_humanization_prompt(self, text: str, language: str, iteration: int) -> str:
-        """Build prompt for humanization"""
+        """Build improved prompt for humanization"""
         
         language_names = {
             'es': 'español',
@@ -125,51 +117,100 @@ class OllamaRewriter:
         
         lang_name = language_names.get(language, language)
         
-        # Base strategies
-        strategies = [
-            "Varía la estructura de las oraciones de manera natural",
-            "Usa un tono más conversacional y personal",
-            "Incorpora transiciones naturales entre ideas",
-            "Añade matices sutiles y expresiones coloquiales apropiadas",
-            "Ajusta el ritmo y flujo del texto para sonar más humano",
-            "Elimina patrones repetitivos típicos de IA"
-        ]
-        
-        # Adjust strategy based on iteration
-        if iteration > 1:
-            strategies.append("Enfócate en hacer el texto aún más natural y menos detectable como IA")
-            strategies.append("Introduce variaciones significativas respecto a la versión anterior")
-        
-        prompt = f"""Eres un experto escritor en {lang_name}. Tu tarea es reescribir el siguiente texto para que suene completamente natural y humano, evitando cualquier patrón que pueda ser detectado como generado por IA.
+        # PROMPT MEJORADO con técnicas anti-detección
+        if iteration == 1:
+            prompt = f"""Eres un escritor experto. Tu tarea es REESCRIBIR completamente el siguiente texto para que NO sea detectable como escrito por IA.
 
-ESTRATEGIAS A APLICAR:
-{chr(10).join(f'- {s}' for s in strategies)}
+TÉCNICAS CRÍTICAS - DEBES APLICAR TODAS:
+
+1. VARIACIÓN DE ESTRUCTURA:
+   - Alterna entre oraciones cortas y largas
+   - Usa frases subordinadas de forma irregular
+   - Rompe patrones simétricos
+   - Varía la posición de sujeto y verbo
+
+2. IMPERFECCIONES HUMANAS:
+   - Añade algunas frases levemente redundantes (como hacen los humanos)
+   - Usa ocasionalmente construcciones menos formales
+   - Incluye transiciones naturales pero no perfectas
+   - Varía el ritmo del texto (no todo uniforme)
+
+3. ESTILO PERSONAL:
+   - Usa expresiones coloquiales apropiadas
+   - Añade matices subjetivos sutiles
+   - Varía el vocabulario (evita repetir palabras técnicas)
+   - Incluye conectores naturales variados
+
+4. ANTI-PATRONES IA:
+   - NO uses listas simétricas
+   - NO uses estructura de 3 puntos (bullet pattern)
+   - NO uses palabras como "además", "asimismo" en exceso
+   - NO hagas párrafos del mismo largo
+   - NO uses patrones repetitivos
 
 IMPORTANTE:
-- Mantén el MISMO significado y contenido del texto original
-- NO agregues información nueva
-- NO cambies el mensaje principal
-- Escribe en {lang_name} natural y fluido
-- Haz que suene como si lo hubiera escrito una persona real
-- Evita estructuras demasiado formales o perfectas
-- Usa vocabulario variado y natural
+- Mantén el SIGNIFICADO EXACTO del texto original
+- NO añadas información nueva
+- NO elimines ideas principales
+- Escribe en {lang_name}
+- El resultado debe sonar como si lo escribiera UNA PERSONA REAL
 
-TEXTO A REESCRIBIR:
-
+TEXTO ORIGINAL:
 {text}
 
-TEXTO HUMANIZADO:"""
+TEXTO REESCRITO (escribe SOLO el texto, sin explicaciones):"""
+
+        else:
+            # Iteraciones posteriores: más agresivo
+            prompt = f"""El texto anterior fue detectado como IA. Necesitas reescribirlo de forma MÁS HUMANA.
+
+CAMBIOS ADICIONALES NECESARIOS (iteración {iteration}):
+
+1. MAYOR VARIACIÓN:
+   - Cambia completamente la estructura de oraciones
+   - Usa sinónimos diferentes a los intentos anteriores
+   - Altera el orden de presentación de ideas
+   - Añade más irregularidad en la estructura
+
+2. MÁS NATURALIDAD:
+   - Incluye expresiones más coloquiales
+   - Usa contracciones cuando sea natural
+   - Añade pequeñas digresiones naturales
+   - Varía más el ritmo y flujo
+
+3. ROMPER PATRONES IA:
+   - Evita completamente estructuras paralelas
+   - No uses enumeraciones explícitas
+   - Varía drásticamente la longitud de oraciones
+   - Usa construcciones más complejas y naturales
+
+TEXTO A MEJORAR:
+{text}
+
+NUEVA VERSIÓN MÁS HUMANA (SOLO el texto):"""
         
         return prompt
     
     def _clean_response(self, text: str) -> str:
-        """Clean up response from potential markdown artifacts"""
-        # Remove markdown code blocks if present
+        """Clean up response from potential artifacts"""
+        # Remove markdown code blocks
         if text.startswith('```'):
             lines = text.split('\n')
             text = '\n'.join(lines[1:-1]) if len(lines) > 2 else text
         
-        # Remove leading/trailing whitespace
+        # Remove common AI prefixes
+        prefixes_to_remove = [
+            "TEXTO REESCRITO:",
+            "NUEVA VERSIÓN:",
+            "VERSIÓN HUMANIZADA:",
+            "Aquí está el texto:",
+            "Here is the text:",
+        ]
+        
+        for prefix in prefixes_to_remove:
+            if text.startswith(prefix):
+                text = text[len(prefix):].strip()
+        
         text = text.strip()
         
         return text

@@ -32,17 +32,44 @@ class OllamaRewriter:
         """Verify Ollama is installed and model is available"""
         try:
             # List available models
-            models = ollama.list()
-            model_names = [m['name'] for m in models.get('models', [])]
+            models_response = ollama.list()
             
-            if self.model not in model_names:
-                logger.warning(f"Model {self.model} not found. Available: {model_names}")
-                raise Exception(f"Model {self.model} not available. Run: ollama pull {self.model}")
+            # Handle different response formats
+            if isinstance(models_response, dict):
+                models_list = models_response.get('models', [])
+            else:
+                models_list = models_response
             
-            logger.info(f"Ollama model {self.model} is ready")
+            # Extract model names - handle different formats
+            model_names = []
+            for model in models_list:
+                if isinstance(model, dict):
+                    # Try different possible keys
+                    name = model.get('name') or model.get('model') or model.get('id')
+                    if name:
+                        model_names.append(name)
+                elif isinstance(model, str):
+                    model_names.append(model)
+            
+            logger.info(f"Available Ollama models: {model_names}")
+            
+            # Check if our model is available
+            model_found = False
+            for name in model_names:
+                if self.model in name or name in self.model:
+                    model_found = True
+                    break
+            
+            if not model_found:
+                logger.warning(f"Model {self.model} not found in available models: {model_names}")
+                logger.warning(f"Attempting to use model anyway. If it fails, run: ollama pull {self.model}")
+            else:
+                logger.info(f"Ollama model {self.model} is ready")
             
         except Exception as e:
             logger.error(f"Error verifying Ollama: {e}")
+            logger.info("Make sure Ollama is running and the model is pulled")
+            logger.info(f"To install: ollama pull {self.model}")
             raise Exception(f"Ollama not available: {e}")
     
     def humanize(self, text: str, language: str, iteration: int = 1) -> Optional[str]:
@@ -110,7 +137,7 @@ class OllamaRewriter:
         
         # Adjust strategy based on iteration
         if iteration > 1:
-            strategies.append("Enfócate en hacer el texto aún más natural y menos detectabl como IA")
+            strategies.append("Enfócate en hacer el texto aún más natural y menos detectable como IA")
             strategies.append("Introduce variaciones significativas respecto a la versión anterior")
         
         prompt = f"""Eres un experto escritor en {lang_name}. Tu tarea es reescribir el siguiente texto para que suene completamente natural y humano, evitando cualquier patrón que pueda ser detectado como generado por IA.

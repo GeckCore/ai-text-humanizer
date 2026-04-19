@@ -1,43 +1,46 @@
-# AI Text Humanizer Configuration
+# AI Text Humanizer Configuration - OPTIMIZADO PARA WINDOWS
 
 # Ollama Configuration
 ollama:
   base_url: "http://localhost:11434"
-  model: "qwen2.5:14b"
-  temperature: 0.7
-  top_p: 0.9
+  model: "qwen2.5:14b"  # O usa "qwen2.5:7b" si tienes poca RAM
+  temperature: 0.9  # AUMENTADO para más variación
+  top_p: 0.95       # AUMENTADO para más creatividad
   max_tokens: 4096
   timeout: 300
 
 # AI Detectors Configuration
 detectors:
+  # SOLO DETECTORES QUE FUNCIONAN
   enabled:
-    - gptzero
-    - writer
-    - sapling
-    - zerogpt
+    - zerogpt  # ← SOLO ESTE FUNCIONA BIEN
+  
+  # DESHABILITADOS - Dan timeout en Windows
+  # - gptzero
+  # - writer
+  # - sapling
   
   gptzero:
     url: "https://gptzero.me"
-    timeout: 30
+    timeout: 60
     
   writer:
     url: "https://writer.com/ai-content-detector/"
-    timeout: 30
+    timeout: 60
     
   sapling:
     url: "https://sapling.ai/ai-content-detector"
-    timeout: 30
+    timeout: 60
     
   zerogpt:
     url: "https://www.zerogpt.com"
-    timeout: 30
+    timeout: 60  # AUMENTADO
 
 # Rewriting Configuration
 rewriting:
-  max_iterations: 5
-  target_threshold: 15  # Maximum acceptable AI detection percentage
-  min_improvement: 5    # Minimum improvement required between iterations
+  max_iterations: 8      # AUMENTADO - más intentos
+  target_threshold: 25   # AUMENTADO - meta más realista
+  min_improvement: 3     # REDUCIDO - aceptar pequeñas mejoras
   timeout_per_iteration: 300
   
   # Humanization strategies
@@ -47,12 +50,14 @@ rewriting:
     - "use_natural_transitions"
     - "incorporate_colloquialisms"
     - "adjust_tone_and_style"
+    - "break_symmetrical_patterns"
+    - "add_natural_imperfections"
 
 # Text Processing
 text:
   min_length: 50
   max_length: 50000
-  chunk_size: 2000  # For long texts, process in chunks
+  chunk_size: 2000
 
 # Supported Languages
 languages:
@@ -71,15 +76,15 @@ languages:
 
 # Output Configuration
 output:
-  directory: "output"
+  directory: "output"  # Directorio relativo - se creará automáticamente
   save_reports: true
   save_humanized_text: true
-  report_format: "txt"  # txt, json, or both
+  report_format: "txt"
   include_timestamps: true
 
 # Logging
 logging:
-  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  level: "INFO"
   directory: "logs"
   max_file_size: "10MB"
   backup_count: 5
@@ -87,13 +92,20 @@ logging:
 
 # Browser Configuration (Playwright)
 browser:
-  headless: true
-  timeout: 30000
+  headless: true     # Cambiar a false para ver qué pasa
+  timeout: 60000     # AUMENTADO a 60 segundos
   user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
   
 # Performance
 performance:
-  parallel_detection: true
-  max_concurrent_detectors: 3
+  parallel_detection: false  # DESHABILITADO - más estable en Windows
+  max_concurrent_detectors: 1  # REDUCIDO
   retry_attempts: 3
-  retry_delay: 2  # seconds
+  retry_delay: 2
+
+# NOTAS IMPORTANTES:
+# - Solo ZeroGPT funciona confiablemente
+# - Temperatura alta (0.9) = más variación pero menos preciso
+# - 8 iteraciones máximo, pero se detendrá si no mejora
+# - Meta de 25% IA es más realista que 15%
+# - Detección paralela deshabilitada para evitar problemas

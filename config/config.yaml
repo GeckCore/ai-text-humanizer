@@ -1,0 +1,99 @@
+# AI Text Humanizer Configuration
+
+# Ollama Configuration
+ollama:
+  base_url: "http://localhost:11434"
+  model: "qwen2.5:14b"
+  temperature: 0.7
+  top_p: 0.9
+  max_tokens: 4096
+  timeout: 300
+
+# AI Detectors Configuration
+detectors:
+  enabled:
+    - gptzero
+    - writer
+    - sapling
+    - zerogpt
+  
+  gptzero:
+    url: "https://gptzero.me"
+    timeout: 30
+    
+  writer:
+    url: "https://writer.com/ai-content-detector/"
+    timeout: 30
+    
+  sapling:
+    url: "https://sapling.ai/ai-content-detector"
+    timeout: 30
+    
+  zerogpt:
+    url: "https://www.zerogpt.com"
+    timeout: 30
+
+# Rewriting Configuration
+rewriting:
+  max_iterations: 5
+  target_threshold: 15  # Maximum acceptable AI detection percentage
+  min_improvement: 5    # Minimum improvement required between iterations
+  timeout_per_iteration: 300
+  
+  # Humanization strategies
+  strategies:
+    - "vary_sentence_structure"
+    - "add_personal_touches"
+    - "use_natural_transitions"
+    - "incorporate_colloquialisms"
+    - "adjust_tone_and_style"
+
+# Text Processing
+text:
+  min_length: 50
+  max_length: 50000
+  chunk_size: 2000  # For long texts, process in chunks
+
+# Supported Languages
+languages:
+  - code: "es"
+    name: "Español"
+  - code: "en"
+    name: "English"
+  - code: "fr"
+    name: "Français"
+  - code: "de"
+    name: "Deutsch"
+  - code: "pt"
+    name: "Português"
+  - code: "it"
+    name: "Italiano"
+
+# Output Configuration
+output:
+  directory: "output"
+  save_reports: true
+  save_humanized_text: true
+  report_format: "txt"  # txt, json, or both
+  include_timestamps: true
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  directory: "logs"
+  max_file_size: "10MB"
+  backup_count: 5
+  format: "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+
+# Browser Configuration (Playwright)
+browser:
+  headless: true
+  timeout: 30000
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  
+# Performance
+performance:
+  parallel_detection: true
+  max_concurrent_detectors: 3
+  retry_attempts: 3
+  retry_delay: 2  # seconds

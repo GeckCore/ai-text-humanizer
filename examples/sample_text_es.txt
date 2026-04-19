@@ -1,0 +1,5 @@
+La inteligencia artificial ha revolucionado numerosos aspectos de nuestra vida cotidiana. Desde asistentes virtuales hasta sistemas de recomendación, la IA se ha integrado profundamente en la tecnología moderna. Los algoritmos de aprendizaje automático permiten a las máquinas aprender de los datos y mejorar su rendimiento con el tiempo.
+
+Los modelos de lenguaje grandes, como los transformers, han demostrado capacidades impresionantes en la comprensión y generación de texto natural. Estos sistemas pueden realizar tareas complejas como traducción, resumen y análisis de sentimiento con notable precisión. La arquitectura transformer, introducida en 2017, marcó un punto de inflexión en el procesamiento del lenguaje natural.
+
+Sin embargo, el desarrollo de la IA también plantea importantes consideraciones éticas. Es fundamental garantizar que estos sistemas se utilicen de manera responsable y beneficiosa para la sociedad. La transparencia, la equidad y la responsabilidad son principios clave que deben guiar el desarrollo y la implementación de tecnologías de IA.

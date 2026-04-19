@@ -163,7 +163,7 @@ class AITextHumanizer:
                 table.add_row(
                     detector.upper(),
                     "N/A",
-                    f"❌ {result.get('error', 'Error')}"
+                    f"❌ {result.get('error', 'Error')[:50]}..."
                 )
         
         console.print(table)
@@ -179,6 +179,8 @@ class AITextHumanizer:
                 console.print("[yellow]⚡ Contenido de IA moderado[/yellow]")
             else:
                 console.print("[green]✨ Bajo contenido de IA[/green]")
+        else:
+            console.print("[yellow]⚠️  No se pudo obtener ningún resultado de detección[/yellow]")
     
     def humanize_text(self, text: str, language: str, max_iterations: int, threshold: float) -> tuple:
         """Humanize text iteratively"""
@@ -191,6 +193,7 @@ class AITextHumanizer:
         best_text = text
         
         history = []
+        no_improvement_count = 0
         
         while iteration < max_iterations:
             iteration += 1
@@ -232,13 +235,21 @@ class AITextHumanizer:
                 improvement = best_score - avg_score
                 best_score = avg_score
                 best_text = humanized
+                no_improvement_count = 0
                 console.print(f"  [green]✨ Mejoró {improvement:.1f}% puntos[/green]")
             else:
+                no_improvement_count += 1
                 console.print(f"  [yellow]⚠️  No mejoró (mejor: {best_score:.1f}%)[/yellow]")
             
             # Check if reached threshold
             if avg_score <= threshold:
                 console.print(f"\n[green]🎉 ¡Objetivo alcanzado! ({avg_score:.1f}% ≤ {threshold}%)[/green]")
+                break
+            
+            # Stop if no improvement for 2 iterations
+            if no_improvement_count >= 2:
+                console.print(f"\n[yellow]⚠️  Sin mejora después de 2 iteraciones. Deteniendo.[/yellow]")
+                console.print(f"[yellow]   Mejor score: {best_score:.1f}%[/yellow]")
                 break
             
             current_text = humanized
@@ -251,46 +262,59 @@ class AITextHumanizer:
         from datetime import datetime
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        output_dir = Path(self.config['output']['directory'])
-        output_dir.mkdir(exist_ok=True)
+        # Get absolute path to output directory
+        output_dir = Path(self.config['output']['directory']).absolute()
+        output_dir.mkdir(exist_ok=True, parents=True)
+        
+        logger.info(f"Guardando archivos en: {output_dir}")
         
         # Save humanized text
         if self.config['output']['save_humanized_text']:
             text_file = output_dir / f"humanized_{timestamp}.txt"
-            with open(text_file, 'w', encoding='utf-8') as f:
-                f.write(humanized)
-            console.print(f"💾 Texto humanizado guardado: [cyan]{text_file}[/cyan]")
+            try:
+                with open(text_file, 'w', encoding='utf-8') as f:
+                    f.write(humanized)
+                console.print(f"💾 Texto humanizado guardado: [cyan]{text_file}[/cyan]")
+                logger.info(f"Texto guardado en: {text_file}")
+            except Exception as e:
+                console.print(f"[red]❌ Error guardando texto: {e}[/red]")
+                logger.error(f"Error guardando texto: {e}")
         
         # Save report
         if self.config['output']['save_reports']:
             report_file = output_dir / f"report_{timestamp}.txt"
-            with open(report_file, 'w', encoding='utf-8') as f:
-                f.write("="*60 + "\n")
-                f.write("AI TEXT HUMANIZER - REPORTE DE RESULTADOS\n")
-                f.write("="*60 + "\n\n")
-                f.write(f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-                f.write(f"Idioma: {language}\n")
-                f.write(f"Score final: {score:.2f}% IA detectada\n")
-                f.write(f"Iteraciones: {len(history)}\n\n")
+            try:
+                with open(report_file, 'w', encoding='utf-8') as f:
+                    f.write("="*60 + "\n")
+                    f.write("AI TEXT HUMANIZER - REPORTE DE RESULTADOS\n")
+                    f.write("="*60 + "\n\n")
+                    f.write(f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                    f.write(f"Idioma: {language}\n")
+                    f.write(f"Score final: {score:.2f}% IA detectada\n")
+                    f.write(f"Iteraciones: {len(history)}\n\n")
+                    
+                    f.write("-"*60 + "\n")
+                    f.write("HISTORIAL DE ITERACIONES\n")
+                    f.write("-"*60 + "\n\n")
+                    
+                    for entry in history:
+                        f.write(f"Iteración {entry['iteration']}: {entry['score']:.2f}%\n")
+                    
+                    f.write("\n" + "-"*60 + "\n")
+                    f.write("TEXTO ORIGINAL\n")
+                    f.write("-"*60 + "\n\n")
+                    f.write(original)
+                    
+                    f.write("\n\n" + "-"*60 + "\n")
+                    f.write("TEXTO HUMANIZADO (MEJOR VERSIÓN)\n")
+                    f.write("-"*60 + "\n\n")
+                    f.write(humanized)
                 
-                f.write("-"*60 + "\n")
-                f.write("HISTORIAL DE ITERACIONES\n")
-                f.write("-"*60 + "\n\n")
-                
-                for entry in history:
-                    f.write(f"Iteración {entry['iteration']}: {entry['score']:.2f}%\n")
-                
-                f.write("\n" + "-"*60 + "\n")
-                f.write("TEXTO ORIGINAL\n")
-                f.write("-"*60 + "\n\n")
-                f.write(original)
-                
-                f.write("\n\n" + "-"*60 + "\n")
-                f.write("TEXTO HUMANIZADO (MEJOR VERSIÓN)\n")
-                f.write("-"*60 + "\n\n")
-                f.write(humanized)
-                
-            console.print(f"📄 Reporte guardado: [cyan]{report_file}[/cyan]")
+                console.print(f"📄 Reporte guardado: [cyan]{report_file}[/cyan]")
+                logger.info(f"Reporte guardado en: {report_file}")
+            except Exception as e:
+                console.print(f"[red]❌ Error guardando reporte: {e}[/red]")
+                logger.error(f"Error guardando reporte: {e}")
 
 
 @click.command()

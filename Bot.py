@@ -1,193 +1,164 @@
-import sys
-import msvcrt
-import time
+import tkinter as tk
+from tkinter import font
+import re
 
-# --- BIBLIOTECA DE CÓDIGOS PROFESIONALES PRE-PROGRAMADOS ---
-# Aquí están los códigos reales que el programa "escribirá" por ti.
-# Se han formateado con indentación y comentarios para máxima verosimilitud.
+# Fragmento de código profesional para simular
+CODE_DATA = """import numpy as np
+from scipy.fft import fft, fftfreq
+import matplotlib.pyplot as plt
 
-COOPER_KRNL_SUMA = """def calculate_optimized_sum(data_stream: list[int]) -> int:
-    \"\"\"
-    Performs an arithmetic reduction on the input stream using a vectorized
-    vectorization-ready approach. This ensures O(n) complexity.
-    
-    :param data_stream: A list of integer inputs.
-    :return: The final sum reduction result.
-    \"\"\"
-    import functools
-    
-    # Initialize high-speed accumulator register
-    accumulated_result: int = 0
-    
-    try:
-        # Utilize internal core reduction optimized for matrix-adjacent operations
-        accumulated_result = functools.reduce(lambda x, y: x + y, data_stream)
-        print(f"Kernel arithmetic operation complete. Value: {accumulated_result}")
-    except ValueError as kernel_error:
-        # Fallback to soft-kernel addition for data sanitization
-        for data_point in data_stream:
-            accumulated_result += data_point
-        print(f"Soft-kernel fallback engaged: {kernel_error}")
-        
-    return accumulated_result
+class SignalProcessor:
+    \"\"\"Analizador de espectro para señales complejas v2.1.0\"\"\"
+    def __init__(self, sampling_rate: int, duration: float):
+        self.fs = sampling_rate
+        self.t = np.linspace(0, duration, int(self.fs * duration), endpoint=False)
+        self.buffer = None
 
-# Execution vector
-input_buffer: list[int] = [1024, 2048, 512, 10]
-optimized_total: int = calculate_optimized_sum(input_buffer)
-"""
+    @staticmethod
+    def _apply_hanning_window(data):
+        return data * np.hanning(len(data))
 
-COOPER_MATRICES = """import numpy as np
-from scipy.linalg import decomp
+    def generate_synthetic_stream(self, freqs: list):
+        \"\"\"Genera una señal multicanal con ruido gaussiano\"\"\"
+        signal = sum(np.sin(2 * np.pi * f * self.t) for f in freqs)
+        noise = np.random.normal(0, 0.5, len(self.t))
+        self.buffer = signal + noise
+        return self.buffer
 
-def initiate_parallel_matrix_handshake(matrix_a: np.ndarray, matrix_b: np.ndarray) -> np.ndarray:
-    \"\"\"
-    Executes a high-bandwidth matrix multiplication using internal parallel
-    data-stream buffers. Utilizes advanced kernel optimization flags.
-    \"\"\"
-    
-    # Pre-validation of matrix-dimension compatibility
-    if matrix_a.shape[1] != matrix_b.shape[0]:
-        raise ValueError("Invalid dimension handshake: M_A.cols != M_B.rows")
-    
-    print("Matrix handshake initiated. Optimizing ALU allocation...")
-    
-    # Utilize BLAS/LAPACK optimized core. No manual looping is acceptable.
-    multiplication_result = np.matmul(matrix_a, matrix_b)
-    
-    print("Multiplication vector complete. Dispatching result buffer.")
-    return multiplication_result
-
-# Setup test vectors for matrix operation
-print("Generating test tensors...")
-A_tensor = np.random.rand(5, 5) # 5x5 floating-point matrix
-B_tensor = np.random.eye(5, 5)   # 5x5 identity matrix for handshake testing
-
-final_tensor_product = initiate_parallel_matrix_handshake(A_tensor, B_tensor)
-print("Handshake result tensor head:")
-print(final_tensor_product[:1,:])
-"""
-
-COOPER_BD_DATA = """import pandas as pd
-import glob
-
-def ingest_optimized_database_stream(search_path: str = "./data/*.csv") -> pd.DataFrame:
-    \"\"\"
-    Data Ingestion pipeline with automatic format vectorization.
-    Scans the specified path and merges all found datasets into a main stream.
-    \"\"\"
-    data_files: list[str] = glob.glob(search_path)
-    print(f"Found {len(data_files)} data-stream vectors.")
-    
-    master_datastore = pd.DataFrame()
-    
-    for file_vector in data_files:
-        print(f"Reading: {file_vector}")
-        # Optimized load with C-engine for speed
-        stream_data = pd.read_csv(file_vector, engine='c')
-        master_datastore = pd.concat([master_datastore, stream_data], ignore_index=True)
-        
-    print("Stream merge complete. Analyzing data-stream schema.")
-    print(master_datastore.info())
-    return master_datastore
-
-# Initialize ingestion vector
-# master_database_stream = ingest_optimized_database_stream()
-print("Data ingestion vector configured. Standby for live stream.")
-"""
-
-COOPER_UNIDAD_NUCLEO = """import os
-import signal
-import sys
-
-class CoreController:
-    def __init__(self, target_pid: int):
-        self._target_pid = target_pid
-        self._is_active = False
-        print(f"Nucleus control link established with process {target_pid}.")
-        
-    def engage_core_bypass(self):
-        \"\"\"
-        Overrides standard system calls for direct register access.
-        \"\"\"
-        # WARNING: High-level access detected.
-        print("ALERT: Engaging direct register access. Proceeding with caution.")
-        
-        # Simulate send-signal action
-        # os.kill(self._target_pid, signal.SIGCONT)
-        self._is_active = True
-        print("Register state: BYPASS ACTIVE")
-        
-    def validate_bypass_integrity(self):
-        # ... validation logic ...
-        return True
-
-# Initialize nucleus unit
-process_nucleo = CoreController(os.getpid())
-process_nucleo.engage_core_bypass()
-"""
-
-SNIPPETS = {
-    "1": ("Suma Aritmética Avanzada", COOPER_KRNL_SUMA),
-    "2": ("Operaciones Matriz Tensor", COOPER_MATRICES),
-    "3": ("Base de Datos Cooper Data", COOPER_BD_DATA),
-    "4": ("Unidad de Control del Núcleo", COOPER_UNIDAD_NUCLEO),
-}
-
-def simulate_ide_screen(snippet_title):
-    print("\n--- INICIO DE SIMULACIÓN DE IDE DE DESARROLLADOR ---")
-    print(f"HACKING ON CODEBASE: '{snippet_title}'")
-    print("-" * 50)
-    print("-> Pulsa CUALQUIER tecla para 'escribir'. <-")
-    print("-> Mantén una tecla pulsada para mayor velocidad. <-")
-    print("-> Pulsa Ctrl+C para salir de la simulación. <-\n")
-
-def simulate_typing():
-    print("--- VS Code Intelligent Cooper ---\n")
-    print("Selecciona un script para que el sistema lo 'escriba':")
-    for key, (title, _) in SNIPPETS.items():
-        print(f"{key}. {title}")
-    print("Q. Salir")
-
-    opcion = input("\nElige una opción: ").strip().upper()
-
-    if opcion == 'Q':
-        return
-    elif opcion not in SNIPPETS:
-        print("Opción no válida.")
-        return
-
-    selected_title, selected_code = SNIPPETS[opcion]
-    
-    simulate_ide_screen(selected_title)
-    
-    # Puntero para rastrear el carácter actual en el código
-    current_char_index = 0
-    total_chars = len(selected_code)
-
-    # El programa se mantiene en un bucle continuo hasta llegar al final o Ctrl+C
-    while current_char_index < total_chars:
-        if msvcrt.kbhit():  # Detecta si hay una pulsación de tecla
-            msvcrt.getch()  # Lee la tecla (y la ignora)
+    def compute_fft_core(self):
+        # Optimización de memoria para transformación rápida
+        if self.buffer is None:
+            raise ValueError("Buffer de señal vacío")
             
-            # Obtiene el siguiente carácter del código pre-programado
-            char_to_print = selected_code[current_char_index]
-            
-            # Escribe el carácter y vacía el búfer para que aparezca al instante
-            sys.stdout.write(char_to_print)
-            sys.stdout.flush()
-            
-            current_char_index += 1
-            
-            # Añade un pequeñísimo retardo opcional para que la escritura se sienta más natural.
-            # 0.005s es casi instantáneo, haciéndolo muy responsivo a la pulsación.
-            time.sleep(0.005) 
+        N = len(self.buffer)
+        windowed_signal = self._apply_hanning_window(self.buffer)
+        yf = fft(windowed_signal)
+        xf = fftfreq(N, 1 / self.fs)[:N//2]
+        
+        return xf, 2.0/N * np.abs(yf[0:N//2])
 
-    print("\n\n--- FIN DEL SCRIPT ---")
+def main():
+    # Parámetros de inicialización del núcleo
+    FS = 44100
+    DURATION = 2.0
+    
+    engine = SignalProcessor(sampling_rate=FS, duration=DURATION)
+    data = engine.generate_synthetic_stream(freqs=[50, 120, 440])
+    
+    print(f"[SYSTEM]: Procesando {len(data)} muestras...")
+    xf, yf = engine.compute_fft_core()
+    
+    # Exportar resultados a matriz de transformación
+    output_matrix = np.column_stack((xf, yf))
+    return output_matrix
 
 if __name__ == "__main__":
-    try:
-        simulate_typing()
-    except KeyboardInterrupt:
-        print("\n\nSimulación interrumpida por el usuario.")
-    except Exception as e:
-        print(f"\nOcurrió un error inesperado: {e}")
+    matrix_result = main()
+    print("Kernel execution successful. Data ready.")
+"""
+
+class ProEditorSimulator:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Visual Studio Code - processor_core.py")
+        self.root.geometry("1100x750")
+        self.root.configure(bg="#1e1e1e")
+        
+        self.char_index = 0
+        self.setup_ui()
+        self.root.bind("<Key>", self.inject_code)
+
+    def setup_ui(self):
+        # Colores VS Code
+        bg_dark = "#1e1e1e"
+        bg_sidebar = "#333333"
+        bg_explorer = "#252526"
+        accent_blue = "#007acc"
+        text_white = "#cccccc"
+
+        # Barra lateral izquierda (Iconos)
+        self.left_bar = tk.Frame(self.root, width=50, bg=bg_sidebar)
+        self.left_bar.pack(side="left", fill="y")
+        
+        # Explorador de archivos
+        self.explorer = tk.Frame(self.root, width=200, bg=bg_explorer)
+        self.explorer.pack(side="left", fill="y")
+        tk.Label(self.explorer, text="EXPLORER", fg=text_white, bg=bg_explorer, font=("Segoe UI", 9, "bold")).pack(pady=10, padx=10, anchor="w")
+        tk.Label(self.explorer, text=" > PROJECT_CORE", fg=text_white, bg=bg_explorer, font=("Segoe UI", 8)).pack(padx=10, anchor="w")
+        tk.Label(self.explorer, text="    python_env", fg="#6a9955", bg=bg_explorer, font=("Segoe UI", 8)).pack(padx=15, anchor="w")
+        tk.Label(self.explorer, text="  🐍 processor_core.py", fg="#569cd6", bg="#37373d", font=("Segoe UI", 9), padx=10).pack(fill="x", pady=2)
+
+        # Barra de pestañas
+        self.tab_bar = tk.Frame(self.root, height=35, bg="#2d2d2d")
+        self.tab_bar.pack(side="top", fill="x")
+        tk.Label(self.tab_bar, text="  processor_core.py  x ", fg="white", bg=bg_dark, font=("Segoe UI", 9)).pack(side="left", fill="y")
+
+        # Barra de estado inferior
+        self.status = tk.Frame(self.root, height=22, bg=accent_blue)
+        self.status.pack(side="bottom", fill="x")
+        tk.Label(self.status, text="  master* | Ln 42, Col 12 | Spaces: 4 | UTF-8 | Python 3.11.5", fg="white", bg=accent_blue, font=("Segoe UI", 8)).pack(side="left")
+
+        # Área del Editor
+        self.text_font = font.Font(family="Consolas", size=13)
+        self.editor = tk.Text(
+            self.root, bg=bg_dark, fg="#d4d4d4",
+            insertbackground="white", relief="flat",
+            font=self.text_font, padx=20, pady=20,
+            highlightthickness=0, undo=True
+        )
+        self.editor.pack(expand=True, fill="both")
+
+        # Configuración de Syntax Highlighting
+        self.editor.tag_configure("kw", foreground="#569cd6")      # Keywords
+        self.editor.tag_configure("str", foreground="#ce9178")     # Strings
+        self.editor.tag_configure("com", foreground="#6a9955")     # Comments
+        self.editor.tag_configure("fn", foreground="#dcdcaa")      # Functions
+        self.editor.tag_configure("cls", foreground="#4ec9b0")     # Classes
+        self.editor.tag_configure("num", foreground="#b5cea8")     # Numbers
+        self.editor.tag_configure("dec", foreground="#dcdcaa")     # Decorators
+
+    def highlight_syntax(self):
+        content = self.editor.get("1.0", tk.END)
+        self.editor.mark_set("range_start", "1.0")
+        
+        # Mapa de patrones
+        patterns = [
+            ("com", r'#.*'),
+            ("str", r'".*?"|\'.*?\''),
+            ("kw", r'\b(def|class|import|from|if|return|while|for|in|else|elif|try|except|as|with|yield|lambda|pass|raise|None|True|False)\b'),
+            ("fn", r'\b\w+(?=\()'),
+            ("cls", r'\b[A-Z]\w+'),
+            ("num", r'\b\d+\b'),
+            ("dec", r'@\w+'),
+        ]
+
+        for tag, pattern in patterns:
+            self.editor.tag_remove(tag, "1.0", tk.END)
+            for match in re.finditer(pattern, content):
+                start = f"1.0 + {match.start()} chars"
+                end = f"1.0 + {match.end()} chars"
+                self.editor.tag_add(tag, start, end)
+
+    def inject_code(self, event):
+        # Bloquea teclas especiales para no romper la UI
+        if event.keysym in ["Shift_L", "Shift_R", "Control_L", "Control_R", "Alt_L", "Alt_R", "Caps_Lock"]:
+            return
+
+        if self.char_index < len(CODE_DATA):
+            char = CODE_DATA[self.char_index]
+            self.editor.insert(tk.END, char)
+            self.char_index += 1
+            
+            # Autoscroll
+            self.editor.see(tk.END)
+            
+            # Aplicar colores cada 2 caracteres para no saturar el procesador
+            if self.char_index % 2 == 0:
+                self.highlight_syntax()
+                
+        return "break" # Impide que la tecla real se escriba
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ProEditorSimulator(root)
+    root.mainloop()

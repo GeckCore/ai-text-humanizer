@@ -1,114 +1,193 @@
-import tkinter as tk
-from tkinter import font
-import re
+import sys
+import msvcrt
+import time
 
-# --- CONFIGURACIÓN DEL CÓDIGO A "ESCRIBIR" ---
-# Puedes meter aquí cualquier código complejo para que parezca más pro.
-FAKE_CODE = """import numpy as np
-import tensorflow as tf
-from datetime import datetime
+# --- BIBLIOTECA DE CÓDIGOS PROFESIONALES PRE-PROGRAMADOS ---
+# Aquí están los códigos reales que el programa "escribirá" por ti.
+# Se han formateado con indentación y comentarios para máxima verosimilitud.
 
-class NeuralMatrixProcessor:
-    def __init__(self, layers=[128, 64, 32]):
-        self.depth = len(layers)
-        self.weights = []
-        self.bias = None
-        print(f"[{datetime.now()}] Initializing Core...")
+COOPER_KRNL_SUMA = """def calculate_optimized_sum(data_stream: list[int]) -> int:
+    \"\"\"
+    Performs an arithmetic reduction on the input stream using a vectorized
+    vectorization-ready approach. This ensures O(n) complexity.
+    
+    :param data_stream: A list of integer inputs.
+    :return: The final sum reduction result.
+    \"\"\"
+    import functools
+    
+    # Initialize high-speed accumulator register
+    accumulated_result: int = 0
+    
+    try:
+        # Utilize internal core reduction optimized for matrix-adjacent operations
+        accumulated_result = functools.reduce(lambda x, y: x + y, data_stream)
+        print(f"Kernel arithmetic operation complete. Value: {accumulated_result}")
+    except ValueError as kernel_error:
+        # Fallback to soft-kernel addition for data sanitization
+        for data_point in data_stream:
+            accumulated_result += data_point
+        print(f"Soft-kernel fallback engaged: {kernel_error}")
+        
+    return accumulated_result
 
-    def optimize_buffers(self, data_stream):
-        # Optimizando punteros de memoria para procesamiento en paralelo
-        mask = np.random.choice([0, 1], size=data_stream.shape)
-        return tf.math.multiply(data_stream, mask)
-
-    async def execute_query(self, query_id):
-        # Simulación de handshake asíncrono
-        endpoint = f"https://api.internal.network/v3/{query_id}"
-        async with session.get(endpoint) as response:
-            return await response.json()
-
-def main():
-    processor = NeuralMatrixProcessor()
-    raw_data = np.random.rand(1024, 1024)
-    processed = processor.optimize_buffers(raw_data)
-    print("Kernel status: ONLINE")
-
-if __name__ == "__main__":
-    main()
+# Execution vector
+input_buffer: list[int] = [1024, 2048, 512, 10]
+optimized_total: int = calculate_optimized_sum(input_buffer)
 """
 
-class FakeVSCode:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Visual Studio Code - matrix_processor.py")
-        self.root.geometry("1000x700")
-        self.root.configure(bg="#1e1e1e")
+COOPER_MATRICES = """import numpy as np
+from scipy.linalg import decomp
+
+def initiate_parallel_matrix_handshake(matrix_a: np.ndarray, matrix_b: np.ndarray) -> np.ndarray:
+    \"\"\"
+    Executes a high-bandwidth matrix multiplication using internal parallel
+    data-stream buffers. Utilizes advanced kernel optimization flags.
+    \"\"\"
+    
+    # Pre-validation of matrix-dimension compatibility
+    if matrix_a.shape[1] != matrix_b.shape[0]:
+        raise ValueError("Invalid dimension handshake: M_A.cols != M_B.rows")
+    
+    print("Matrix handshake initiated. Optimizing ALU allocation...")
+    
+    # Utilize BLAS/LAPACK optimized core. No manual looping is acceptable.
+    multiplication_result = np.matmul(matrix_a, matrix_b)
+    
+    print("Multiplication vector complete. Dispatching result buffer.")
+    return multiplication_result
+
+# Setup test vectors for matrix operation
+print("Generating test tensors...")
+A_tensor = np.random.rand(5, 5) # 5x5 floating-point matrix
+B_tensor = np.random.eye(5, 5)   # 5x5 identity matrix for handshake testing
+
+final_tensor_product = initiate_parallel_matrix_handshake(A_tensor, B_tensor)
+print("Handshake result tensor head:")
+print(final_tensor_product[:1,:])
+"""
+
+COOPER_BD_DATA = """import pandas as pd
+import glob
+
+def ingest_optimized_database_stream(search_path: str = "./data/*.csv") -> pd.DataFrame:
+    \"\"\"
+    Data Ingestion pipeline with automatic format vectorization.
+    Scans the specified path and merges all found datasets into a main stream.
+    \"\"\"
+    data_files: list[str] = glob.glob(search_path)
+    print(f"Found {len(data_files)} data-stream vectors.")
+    
+    master_datastore = pd.DataFrame()
+    
+    for file_vector in data_files:
+        print(f"Reading: {file_vector}")
+        # Optimized load with C-engine for speed
+        stream_data = pd.read_csv(file_vector, engine='c')
+        master_datastore = pd.concat([master_datastore, stream_data], ignore_index=True)
         
-        self.index = 0
-        self.setup_ui()
-        self.root.bind("<Key>", self.type_code)
+    print("Stream merge complete. Analyzing data-stream schema.")
+    print(master_datastore.info())
+    return master_datastore
 
-    def setup_ui(self):
-        # Barra lateral (Sidebar)
-        self.sidebar = tk.Frame(self.root, width=50, bg="#333333")
-        self.sidebar.pack(side="left", fill="y")
+# Initialize ingestion vector
+# master_database_stream = ingest_optimized_database_stream()
+print("Data ingestion vector configured. Standby for live stream.")
+"""
+
+COOPER_UNIDAD_NUCLEO = """import os
+import signal
+import sys
+
+class CoreController:
+    def __init__(self, target_pid: int):
+        self._target_pid = target_pid
+        self._is_active = False
+        print(f"Nucleus control link established with process {target_pid}.")
         
-        # Área de archivos (Explorador)
-        self.explorer = tk.Frame(self.root, width=150, bg="#252526")
-        self.explorer.pack(side="left", fill="y")
-        tk.Label(self.explorer, text=" EXPLORER", fg="#aaaaaa", bg="#252526", font=("Segoe UI", 10)).pack(pady=10)
-        tk.Label(self.explorer, text="  main.py", fg="#ffffff", bg="#37373d", anchor="w").pack(fill="x")
+    def engage_core_bypass(self):
+        \"\"\"
+        Overrides standard system calls for direct register access.
+        \"\"\"
+        # WARNING: High-level access detected.
+        print("ALERT: Engaging direct register access. Proceeding with caution.")
         
-        # Barra de estado inferior
-        self.status = tk.Frame(self.root, height=20, bg="#007acc")
-        self.status.pack(side="bottom", fill="x")
-        tk.Label(self.status, text="  Line 1, Col 1  |  UTF-8  |  Python 3.10.2", fg="white", bg="#007acc", font=("Segoe UI", 8)).pack(side="left")
-
-        # Editor de texto
-        self.text_font = font.Font(family="Consolas", size=12)
-        self.editor = tk.Text(
-            self.root, bg="#1e1e1e", fg="#d4d4d4", 
-            insertbackground="#ffffff", relief="flat",
-            font=self.text_font, padx=10, pady=10,
-            highlightthickness=0
-        )
-        self.editor.pack(expand=True, fill="both")
+        # Simulate send-signal action
+        # os.kill(self._target_pid, signal.SIGCONT)
+        self._is_active = True
+        print("Register state: BYPASS ACTIVE")
         
-        # Configuración de colores para resaltado (Syntax Highlighting)
-        self.editor.tag_configure("keyword", foreground="#569cd6")
-        self.editor.tag_configure("string", foreground="#ce9178")
-        self.editor.tag_configure("comment", foreground="#6a9955")
-        self.editor.tag_configure("function", foreground="#dcdcaa")
+    def validate_bypass_integrity(self):
+        # ... validation logic ...
+        return True
 
-    def highlight(self):
-        # Resaltado básico por regex
-        content = self.editor.get("1.0", tk.END)
-        for tag, pattern in [
-            ("keyword", r'\b(def|class|import|from|if|return|async|await|with|as)\b'),
-            ("string", r'".*?"|\'.*?\''),
-            ("comment", r'#.*'),
-            ("function", r'\b\w+(?=\()')
-        ]:
-            self.editor.tag_remove(tag, "1.0", tk.END)
-            for match in re.finditer(pattern, content):
-                start = f"1.0 + {match.start()} chars"
-                end = f"1.0 + {match.end()} chars"
-                self.editor.tag_add(tag, start, end)
+# Initialize nucleus unit
+process_nucleo = CoreController(os.getpid())
+process_nucleo.engage_core_bypass()
+"""
 
-    def type_code(self, event):
-        # Evitar teclas de sistema
-        if event.keysym in ["Shift_L", "Shift_R", "Control_L", "Control_R", "Alt_L", "Alt_R"]:
-            return
+SNIPPETS = {
+    "1": ("Suma Aritmética Avanzada", COOPER_KRNL_SUMA),
+    "2": ("Operaciones Matriz Tensor", COOPER_MATRICES),
+    "3": ("Base de Datos Cooper Data", COOPER_BD_DATA),
+    "4": ("Unidad de Control del Núcleo", COOPER_UNIDAD_NUCLEO),
+}
 
-        if self.index < len(FAKE_CODE):
-            # Escribir el siguiente caracter
-            char = FAKE_CODE[self.index]
-            self.editor.insert(tk.END, char)
-            self.index += 1
-            self.editor.see(tk.END) # Auto-scroll
-            self.highlight()
-        return "break" # Evita que se escriba la tecla real pulsada
+def simulate_ide_screen(snippet_title):
+    print("\n--- INICIO DE SIMULACIÓN DE IDE DE DESARROLLADOR ---")
+    print(f"HACKING ON CODEBASE: '{snippet_title}'")
+    print("-" * 50)
+    print("-> Pulsa CUALQUIER tecla para 'escribir'. <-")
+    print("-> Mantén una tecla pulsada para mayor velocidad. <-")
+    print("-> Pulsa Ctrl+C para salir de la simulación. <-\n")
+
+def simulate_typing():
+    print("--- VS Code Intelligent Cooper ---\n")
+    print("Selecciona un script para que el sistema lo 'escriba':")
+    for key, (title, _) in SNIPPETS.items():
+        print(f"{key}. {title}")
+    print("Q. Salir")
+
+    opcion = input("\nElige una opción: ").strip().upper()
+
+    if opcion == 'Q':
+        return
+    elif opcion not in SNIPPETS:
+        print("Opción no válida.")
+        return
+
+    selected_title, selected_code = SNIPPETS[opcion]
+    
+    simulate_ide_screen(selected_title)
+    
+    # Puntero para rastrear el carácter actual en el código
+    current_char_index = 0
+    total_chars = len(selected_code)
+
+    # El programa se mantiene en un bucle continuo hasta llegar al final o Ctrl+C
+    while current_char_index < total_chars:
+        if msvcrt.kbhit():  # Detecta si hay una pulsación de tecla
+            msvcrt.getch()  # Lee la tecla (y la ignora)
+            
+            # Obtiene el siguiente carácter del código pre-programado
+            char_to_print = selected_code[current_char_index]
+            
+            # Escribe el carácter y vacía el búfer para que aparezca al instante
+            sys.stdout.write(char_to_print)
+            sys.stdout.flush()
+            
+            current_char_index += 1
+            
+            # Añade un pequeñísimo retardo opcional para que la escritura se sienta más natural.
+            # 0.005s es casi instantáneo, haciéndolo muy responsivo a la pulsación.
+            time.sleep(0.005) 
+
+    print("\n\n--- FIN DEL SCRIPT ---")
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = FakeVSCode(root)
-    root.mainloop()
+    try:
+        simulate_typing()
+    except KeyboardInterrupt:
+        print("\n\nSimulación interrumpida por el usuario.")
+    except Exception as e:
+        print(f"\nOcurrió un error inesperado: {e}")
